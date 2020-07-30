@@ -259,6 +259,7 @@ func parseMetadataString(metaString string) map[string]*string {
 func identityGetObject(c s3iface.S3API, input *s3.GetObjectInput, verify int, partsize int64) (output *s3.GetObjectOutput, err error) {
 	req, out := c.GetObjectRequest(input)
 	output = out
+	block_size := GetDataBlockSize(partsize)
 	req.HTTPRequest.Header.Set("Accept-Encoding", "identity")
 	err = req.Send()
 	if err == nil && req.HTTPResponse.Body != nil {
@@ -294,7 +295,7 @@ func identityGetObject(c s3iface.S3API, input *s3.GetObjectInput, verify int, pa
 					//
 					// We can further optimize this call by dealing with larger blocks as opposed to single characters but it's probably not worth it right now
 					// since this is a special non-performance path that validates all data read.
-					offset := (index & (objectDataBlockSize - 1)) % keylen
+					offset := (index & (block_size - 1)) % keylen
 
 					if buffer[i] != key[offset] {
 						readError = errors.New("Retrieved data different from expected")

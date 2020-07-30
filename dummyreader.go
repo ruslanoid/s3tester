@@ -13,7 +13,7 @@ import (
 // for large objects.
 //
 // This MUST be a power of two to allow for fast modulo optimizations.
-const objectDataBlockSize = 4096
+// const objectDataBlockSize = 4096
 // const objectDataBlockSize = 32 * 1024
 
 // characters for random strings
@@ -28,11 +28,19 @@ type DummyReader struct {
 	data   *bytes.Reader
 }
 
+func GetDataBlockSize(size int64) int {
+	if size > 4096 {
+		return 32 * 1024
+	} else {
+		return 4 * 1024
+	}
+}
+
 func NewDummyReader(size int64, seed string) *DummyReader {
 	d := DummyReader{size: size}
-	data := generateDataFromKey(seed, objectDataBlockSize)
+	block_size := GetDataBlockSize(size)
+	data := generateDataFromKey(seed, block_size)
 	d.data = bytes.NewReader(data)
-
 	return &d
 }
 
