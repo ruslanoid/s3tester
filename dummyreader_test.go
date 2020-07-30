@@ -1,9 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"testing"
 )
+
+func TestRuslan(t *testing.T) {
+	data := generateDataFromKey("key", 1024)
+	fmt.Printf("Ruslan: %s", string(data))
+}
 
 func TestRead(t *testing.T) {
 	data := "hello"

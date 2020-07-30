@@ -14,9 +14,12 @@ import (
 //
 // This MUST be a power of two to allow for fast modulo optimizations.
 const objectDataBlockSize = 4096
+// const objectDataBlockSize = 32 * 1024
 
 // characters for random strings
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+// var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")  //!@#$%^&*()[]{}<>")
+var letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+// const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
 // implements io.ReadSeeker
 type DummyReader struct {
@@ -123,19 +126,24 @@ func generateDataFromKey(key string, numBytes int) []byte {
 	//repeat := numBytes / keylen
 	rand.Seed(time.Now().UnixNano())
 	data = append(data, []byte(randSeq(numBytes))...)
-	
+
 	// Generate the remaining substring < keylen
-	remainder := key[:numBytes%keylen]
-	data = append(data, []byte(remainder)...)
+	remainder := numBytes % keylen
+	data = append(data, []byte(randSeq(remainder))...)
 
 	return data
 }
 
 
-func randSeq(n int) string {
-    b := make([]rune, n)
+func randSeq(n int) []byte {
+    /*b := make([]rune, n)
     for i := range b {
         b[i] = letters[rand.Intn(len(letters))]
     }
-    return string(b)
+    return string(b)*/
+    b := make([]byte, n)
+    for i := range b {
+        b[i] = letters[rand.Intn(len(letters))]
+    }
+    return b
 }
