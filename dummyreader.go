@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"time"
 	"math/rand"
+	"time"
 )
 
 // For performance reasons we need to generate data in blocks as opposed to one character at a time. This is especially true
@@ -17,9 +17,8 @@ import (
 // const objectDataBlockSize = 32 * 1024
 
 // characters for random strings
-// var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")  //!@#$%^&*()[]{}<>")
+// var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 var letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-// const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 
 // implements io.ReadSeeker
 type DummyReader struct {
@@ -38,8 +37,8 @@ func GetDataBlockSize(size int64) int {
 
 func NewDummyReader(size int64, seed string) *DummyReader {
 	d := DummyReader{size: size}
-	block_size := GetDataBlockSize(size)
-	data := generateDataFromKey(seed, block_size)
+	// block_size := GetDataBlockSize(size)
+	data := generateDataFromKey(seed, int(size)) // block_size)
 	d.data = bytes.NewReader(data)
 	return &d
 }
@@ -129,29 +128,25 @@ func generateDataFromKey(key string, numBytes int) []byte {
 		return []byte(key[:numBytes])
 	}
 
-	data := make([]byte, 0, numBytes)
-
-	//repeat := numBytes / keylen
 	rand.Seed(time.Now().UnixNano())
-	data = append(data, []byte(randSeq(numBytes))...)
 
-	// Generate the remaining substring < keylen
-	remainder := numBytes % keylen
-	data = append(data, []byte(randSeq(remainder))...)
+	data := make([]byte, 0, numBytes)
+	blockSize := GetDataBlockSize(int64(numBytes))
+	for {
+		data = append(data, randSeq(blockSize)...)
+		if len(data) >= numBytes {
+			break
+		}
+	}
+	// data := randSeq(numBytes)
 
-	return data
+	return data[:numBytes]
 }
 
-
 func randSeq(n int) []byte {
-    /*b := make([]rune, n)
-    for i := range b {
-        b[i] = letters[rand.Intn(len(letters))]
-    }
-    return string(b)*/
-    b := make([]byte, n)
-    for i := range b {
-        b[i] = letters[rand.Intn(len(letters))]
-    }
-    return b
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return b
 }
