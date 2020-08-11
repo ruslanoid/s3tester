@@ -487,7 +487,7 @@ func roundResult(results *result) {
 	results.AverageObjectSize = roundFloat(results.AverageObjectSize, 0)
 }
 
-var percentiles []float64 = []float64{50, 75, 90, 95, 99, 99.9}
+var percentiles []float64 = []float64{50, 75, 90, 95, 99, 99.9, 99.99}
 
 func processPercentiles(results *result) {
 	results.Percentiles = make(map[string]float64)
