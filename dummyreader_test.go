@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"testing"
 )
 
 func TestRandomGeneratedData(t *testing.T) {
-	size := 1024
+	size := 1024 * 4
 	data := generateDataFromKey("s3tester", size)
 	fmt.Printf("Generated Data:\n%s", string(data))
 	if len(data) != size {
@@ -28,8 +29,8 @@ func TestNewDummyReader(t *testing.T) {
 	if int64(bytesRead) != int64(size) {
 		t.Fatalf("expected %d bytes but got %d", size, bytesRead)
 	}
-	fmt.Println("bytesRead:", bytesRead, "reader.size:", reader.size)
-	fmt.Println("buffer:", string(buff))
+	log.Println("bytesRead:", bytesRead, "reader.size:", reader.size)
+	log.Println("buffer:", string(buff))
 }
 
 func TestRead(t *testing.T) {
